@@ -20,7 +20,7 @@ services:
 
   backend:
     container_name: springboot
-    image: gitactions-backend:latest
+    image: dharshinisai2006/gitactions-backend:latest
     ports:
       - "2025:2000"
     depends_on:
@@ -32,7 +32,7 @@ services:
 
   frontend:
     container_name: react
-    image: gitactions-frontend:latest
+    image: dharshinisai2006/gitactions-frontend:latest
     ports:
       - "3000:80"
     depends_on:
