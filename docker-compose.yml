@@ -1,41 +1,50 @@
 services:
   mysqldb:
-    image: mysql:8
     container_name: mysql-db
+    image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: docker
       MYSQL_DATABASE: practicedb
     ports:
       - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     networks:
-      - springboot-mysql-net
+      - springboot-react-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdocker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   backend:
-    image: dharshinisai2006/gitactions-backend:latest
     container_name: springboot
+    image: gitactions-backend:latest
     ports:
       - "2025:2000"
     depends_on:
-      - mysqldb
+      mysqldb:
+        condition: service_healthy
     restart: on-failure
     networks:
-      - springboot-mysql-net
+      - springboot-react-network
 
   frontend:
-    image: dharshinisai2006/gitactions-frontend:latest
     container_name: react
+    image: gitactions-frontend:latest
     ports:
       - "3000:80"
     depends_on:
       - backend
-    restart: on-failure
     networks:
-      - springboot-mysql-net
+      - springboot-react-network
 
+# Declare volumes for persistence
 volumes:
-  mysql_data:
+  mysql-data:
 
+# Define custom bridge network
 networks:
-  springboot-mysql-net:
+  springboot-react-network:
+    driver: bridge
